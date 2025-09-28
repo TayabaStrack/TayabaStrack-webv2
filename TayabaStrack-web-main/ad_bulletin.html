@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Report Bulletin | Admin</title>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    /* Reset */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, sans-serif; display: flex; min-height: 100vh; background: #f5f7fb; color: #333; }
+
+    /* Sidebar */
+    .sidebar {
+      width: 240px;
+      background: #004aad;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 1rem 0;
+    }
+    .sidebar-header {
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      gap: 10px;
+      margin-bottom: 2rem;
+    }
+    .sidebar-header img { width: 40px; }
+    .sidebar-header h2 { font-size: 1.2rem; margin: 0; }
+    .sidebar-menu { list-style: none; }
+    .sidebar-menu li { margin: 0.5rem 0; }
+    .sidebar-menu a {
+      display: flex; 
+      align-items: center; 
+      gap: 10px;
+      padding: 0.8rem 1.5rem; 
+      text-decoration: none; 
+      color: #fff;
+      transition: background 0.3s;
+    }
+    .sidebar-menu li.active a, .sidebar-menu a:hover {
+      background: #0756cc; 
+      border-left: 4px solid #042f68;
+    }
+    .sidebar-footer {
+      text-align: center; 
+      font-size: 0.85rem; 
+      padding: 1rem;
+      border-top: 1px solid rgba(255,255,255,0.2);
+    }
+
+    /* Main */
+    .main { flex: 1; display: flex; flex-direction: column; }
+    .navbar {
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+      padding: 1rem 2rem; 
+      background: #fff; 
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      position: sticky; top: 0; z-index: 10;
+    }
+    .navbar h1 { font-size: 1.4rem; color: #004aad; }
+    .profile { display: flex; align-items: center; gap: 1rem; }
+
+    /* Profile dropdown */
+    .profile-dropdown { position: relative; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; }
+    .avatar { width: 35px; height: 35px; border-radius: 50%; }
+    .username { font-weight: 500; }
+
+    .dropdown-menu {
+      display: none; 
+      position: absolute; 
+      top: 120%; 
+      right: 0;
+      background: #fff; 
+      border: 1px solid #ddd; 
+      border-radius: 6px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15); 
+      min-width: 160px; 
+      z-index: 1000;
+    }
+    .dropdown-menu a {
+      display: block; 
+      padding: 0.6rem 1rem; 
+      text-decoration: none; 
+      color: #333; 
+      font-size: 0.85rem;
+    }
+    .dropdown-menu a:hover { background: #f0f0f0; color: #004aad; }
+
+    /* Reports Section */
+    .reports-section { padding: 1.5rem; }
+    .report-box {
+      background: #fff; 
+      border-radius: 8px; 
+      padding: 0.8rem 1rem; 
+      margin-bottom: 1rem;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+    .table-container { padding: 0.6rem; border-radius: 6px; }
+
+    table {
+      width: 100%; 
+      border-collapse: collapse; 
+      background: #fff; 
+      border-radius: 6px;
+      overflow: hidden; 
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    thead th { background: #f0f0f0; color: #333; font-weight: 600; }
+    th, td {
+      text-align: left; 
+      padding: 0.35rem 0.5rem; 
+      font-size: 0.72rem;
+      white-space: normal; 
+      word-break: break-word; 
+      line-height: 1.2;
+    }
+    tbody tr:nth-child(even) { background: #f9f9f9; }
+    tbody td button, .action a {
+      padding: 0.2rem 0.5rem; 
+      border: none; 
+      border-radius: 4px; 
+      cursor: pointer; 
+      font-size: 0.7rem;
+    }
+
+    .status {
+      display: inline-block; 
+      min-width: 70px; 
+      text-align: center; 
+      padding: 0.25rem 0.5rem;
+      border-radius: 5px; 
+      color: #fff; 
+      font-size: 0.7rem; 
+      font-weight: 600;
+    }
+    .pending { background: #222; }
+    .ongoing { background: #6c757d; }
+    .completed { background: #1cc88a; }
+
+    .report-box-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; }
+    .report-box-header h2 { font-size: 1rem; color: #222; }
+    .report-actions { display: flex; align-items: center; gap: 0.4rem; }
+    .report-actions input {
+      padding: 0.3rem 0.6rem; border: 1px solid #ccc; border-radius: 16px; font-size: 0.75rem;
+    }
+    .report-actions button {
+      background: #004aad; border: none; color: white; padding: 0.3rem 0.6rem; border-radius: 50%; cursor: pointer;
+      font-size: 0.7rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div>
+      <div class="sidebar-header">
+        <img src="logu.png" alt="Logo" class="logo">
+        <h2>TayabaStrack</h2>
+      </div>
+      <ul class="sidebar-menu">
+        <li><a href="ad_dashboard.html"><i class="fa fa-home"></i> Dashboard</a></li>
+        <li><a href="ad_reports.html"><i class="fa fa-tasks"></i> Manage Reports</a></li>
+        <li><a href="ad_map.html"><i class="fa fa-map-marker-alt"></i> Map</a></li>
+        <li><a href="ad_usermanagement.html"><i class="fa fa-users"></i> User Management</a></li>
+        <li class="active"><a href="ad_bulletin.html"><i class="fa fa-bullhorn"></i> Report Bulletin</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-footer">
+      <p>Logged in as:</p>
+      <strong id="sidebarName">Loading...</strong><br>
+      <span id="sidebarPosition">Loading...</span>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+
+    <!-- Navbar -->
+    <nav class="navbar">
+      <h1>Report Bulletin</h1>
+      <div class="profile">
+        <div class="profile-dropdown" id="profileToggle">
+          <img src="admin-profile.jpg" alt="Profile" class="avatar">
+          <span class="username" id="navUsername">Loading...</span>
+          <div class="dropdown-menu" id="dropdownMenu">
+            <a href="profile.html"><i class="fa fa-user"></i> Profile</a>
+            <a href="#" id="logoutBtn"><i class="fa fa-sign-out-alt"></i> Logout</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Reports Section -->
+    <section class="reports-section">
+      <div class="report-box">
+        <div class="report-box-header">
+          <h2>Reports</h2>
+          <div class="report-actions">
+            <input type="text" id="searchReports" placeholder="Search Reports...">
+            <button><i class="fa fa-search"></i></button>
+          </div>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Barangay</th>
+                <th>Phone No.</th>
+                <th>Issue</th>
+                <th>Location</th>
+                <th>Measurements</th>
+                <th>Image</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="reportTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Firebase Admin Check + Firestore Reports -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, collection, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB06vfES5thZQi3Yd11vkooHVH-d5d4Y3o",
+      authDomain: "tayabastrack-23b95.firebaseapp.com",
+      projectId: "tayabastrack-23b95",
+      storageBucket: "tayabastrack-23b95.firebasestorage.app",
+      messagingSenderId: "674055915366",
+      appId: "1:674055915366:web:aa560336c1f8b504eeaaa7"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const sidebarName = document.getElementById("sidebarName");
+    const sidebarPosition = document.getElementById("sidebarPosition");
+    const navUsername = document.getElementById("navUsername");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const reportTable = document.getElementById("reportTable");
+
+    // Admin-only access check
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "index.html";
+        return;
+      }
+
+      try {
+        const userDocRef = doc(db, "users", user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+
+        if (!userDocSnap.exists() || userDocSnap.data().position !== "Admin") {
+          alert("Unauthorized access! You will be redirected.");
+          window.location.href = "index.html";
+          return;
+        }
+
+        const data = userDocSnap.data();
+        sidebarName.textContent = data.name || "Admin";
+        sidebarPosition.textContent = data.position || "Admin";
+        navUsername.textContent = data.name || "Admin";
+
+        // Load Reports from Firestore
+        const querySnapshot = await getDocs(collection(db, "reports"));
+        reportTable.innerHTML = "";
+        querySnapshot.forEach((docSnap) => {
+          const r = docSnap.data();
+          const row = `
+            <tr>
+              <td>${r.name || ""}</td>
+              <td>${r.barangay || ""}</td>
+              <td>${r.phone || ""}</td>
+              <td>${r.issue || ""}</td>
+              <td>${r.location || ""}</td>
+              <td>${r.measurements || ""}</td>
+              <td>${r.image ? `<img src="${r.image}" width="35">` : ""}</td>
+              <td><span class="status ${r.status?.toLowerCase() || "pending"}">${r.status || "Pending"}</span></td>
+              <td class="action">
+                <a href="#" class="edit" data-id="${docSnap.id}">Edit</a> | 
+                <a href="#" class="post" data-id="${docSnap.id}">Post</a>
+              </td>
+            </tr>`;
+          reportTable.insertAdjacentHTML("beforeend", row);
+        });
+
+      } catch (err) {
+        console.error(err);
+        window.location.href = "index.html";
+      }
+    });
+
+    // Logout
+    logoutBtn.addEventListener("click", async () => {
+      await signOut(auth);
+      window.location.href = "index.html";
+    });
+
+    // Search Table
+    function filterTable(inputId, tableId) {
+      const input = document.getElementById(inputId);
+      const filter = input.value.toLowerCase();
+      const rows = document.getElementById(tableId).getElementsByTagName("tr");
+      for (let i = 0; i < rows.length; i++) {
+        let cells = rows[i].getElementsByTagName("td");
+        let match = false;
+        for (let j = 0; j < cells.length; j++) {
+          if (cells[j].innerText.toLowerCase().includes(filter)) {
+            match = true;
+            break;
+          }
+        }
+        rows[i].style.display = match ? "" : "none";
+      }
+    }
+    document.getElementById("searchReports").addEventListener("keyup", () => filterTable("searchReports", "reportTable"));
+
+    // Profile Dropdown
+    const profileToggle = document.getElementById("profileToggle");
+    const dropdownMenu = document.getElementById("dropdownMenu");
+    profileToggle.addEventListener("click", () => {
+      dropdownMenu.style.display = dropdownMenu.style.display === "block" ? "none" : "block";
+    });
+    window.addEventListener("click", function(e) {
+      if (!profileToggle.contains(e.target)) {
+        dropdownMenu.style.display = "none";
+      }
+    });
+
+    // Action Handlers (Edit/Post)
+    document.addEventListener("click", async (e) => {
+      if (e.target.classList.contains("post")) {
+        e.preventDefault();
+        const id = e.target.dataset.id;
+        try {
+          await updateDoc(doc(db, "reports", id), { status: "Completed" });
+          alert("Report posted to bulletin!");
+          location.reload();
+        } catch (err) {
+          console.error("Error posting report:", err);
+        }
+      }
+
+      if (e.target.classList.contains("edit")) {
+        e.preventDefault();
+        const id = e.target.dataset.id;
+        alert("Edit functionality for report " + id + " coming soon.");
+      }
+    });
+
+  </script>
+</body>
+</html>
